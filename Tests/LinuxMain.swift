@@ -4,4 +4,3 @@ import Assignment6Tests
 
 var tests = [XCTestCaseEntry]()
 tests += Assignment6Tests.allTests()
-XCTMain(tests)
