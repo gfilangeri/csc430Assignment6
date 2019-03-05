@@ -59,6 +59,18 @@ final class Assignment6Tests: XCTestCase {
         let p = PrimV(fn: testPrimFunc)
        XCTAssertEqual((p.fn([NumV(num: 1)]) as! NumV).num, 1)
     }
+    
+    func testEnvLookupFound() {
+        XCTAssertEqual(env-lookup(env: top-env, s: "false"), BoolV(b: false))
+    }
+    
+    func testInterpNumC() {
+        XCTAssertEqual(interp(e: NumC(num: 1), env: top-env), NumV(num: 1))
+    }
+    
+    func testInterpIdC() {
+        XCTAssertEqual(interp(e: IdC(id: "true"), env: top-env), BoolV(b: true))
+    }
 
     static var allTests = [
         ("testInitNumC", testInitNumC),
@@ -71,6 +83,9 @@ final class Assignment6Tests: XCTestCase {
         ("testInitStrV", testInitStrV),
         ("testInitCloV", testInitCloV),
         ("testInitBoolV", testInitBoolV),
-        ("testInitPrimV", testInitPrimV)
+        ("testInitPrimV", testInitPrimV),
+        ("testEnvLookupFound", testEnvLookupFound),
+        ("testInterpNumC", testInterpNumC),
+        ("testInterpIdC", testInterpIdC)
     ]
 }

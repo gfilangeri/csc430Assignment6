@@ -19,13 +19,13 @@ class Env {
     }
 }
 
-class NumC : ExprC{
+class NumC : ExprC {
     let num : Float
     
     init (num : Float) {
         self.num = num
     }
-
+    
 }
 
 class StrC : ExprC {
@@ -118,5 +118,31 @@ class PrimV : Value {
     
     init (fn : @escaping (([Value]) -> Value)) {
         self.fn = fn
+    }
+}
+
+let top-env = Env(list: [EnvStruct(id: "true", val: BoolV(b: true)),
+                         EnvStruct(id: "false", val: BoolV(b: false)),
+                         EnvStruct(id: "+", val: PrimV(fn: plus)),
+                         EnvStruct(id: "-", val: PrimV(fn: minus)),
+                         EnvStruct(id: "*", val: PrimV(fn: mult)),
+                         EnvStruct(id: "/", val: PrimV(fn: div)),
+                         EnvStruct(id: "<=", val: PrimV(fn: leq)),
+                         EnvStruct(id: "equal?", val: PrimV(fn: eq))])
+
+func env-lookup(env: Env, s: String) -> Value {
+    for bind in env.list {
+        if bind.id == s {
+            return bind.val
+        }
+    }
+}
+
+func interp(e: ExprC, env: Env) -> Value {
+    switch e {
+    case is NumC:
+        return NumV(num: e.num)
+    case is IdC:
+        return env-lookup(env: env, s: e.id)
     }
 }
