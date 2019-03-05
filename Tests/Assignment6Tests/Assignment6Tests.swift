@@ -71,6 +71,10 @@ final class Assignment6Tests: XCTestCase {
     func testInterpIdC() {
         XCTAssertEqual(interp(e: IdC(id: "true"), env: top-env), BoolV(b: true))
     }
+    
+    func testInterpStrC() {
+        XCTAssertEqual(interp(e: StrC(str: "test"), env: top-env), StrV(str: "test"))
+    }
 
     static var allTests = [
         ("testInitNumC", testInitNumC),
@@ -86,6 +90,7 @@ final class Assignment6Tests: XCTestCase {
         ("testInitPrimV", testInitPrimV),
         ("testEnvLookupFound", testEnvLookupFound),
         ("testInterpNumC", testInterpNumC),
-        ("testInterpIdC", testInterpIdC)
+        ("testInterpIdC", testInterpIdC),
+        ("testInterpStrC", testInterpStrC)
     ]
 }
