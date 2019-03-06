@@ -133,7 +133,7 @@ func plus(vals : [Value]) throws -> Value {
     if vals.count == 2 {
         if let n1 = vals[0] as? NumV {
             if let n2 = vals[1] as? NumV {
-                return NumV(num: (n1.num + n2.num ))
+                return NumV(num: (n1.num + n2.num))
             }
         }
         throw ProgramError.wrongType
@@ -145,7 +145,7 @@ func minus(vals : [Value]) throws -> Value  {
     if vals.count == 2 {
         if let n1 = vals[0] as? NumV {
             if let n2 = vals[1] as? NumV {
-                return NumV(num: (n1.num - n2.num ))
+                return NumV(num: (n1.num - n2.num))
             }
         }
         throw ProgramError.wrongType
@@ -157,7 +157,7 @@ func mult(vals : [Value]) throws -> Value  {
     if vals.count == 2 {
         if let n1 = vals[0] as? NumV {
             if let n2 = vals[1] as? NumV {
-                return NumV(num: (n1.num * n2.num ))
+                return NumV(num: (n1.num * n2.num))
             }
         }
         throw ProgramError.wrongType
@@ -170,12 +170,43 @@ func div(vals : [Value]) throws -> Value  {
         if let n1 = vals[0] as? NumV {
             if let n2 = vals[1] as? NumV {
                 if n2.num != 0 {
-                    return NumV(num: (n1.num / n2.num ))
+                    return NumV(num: (n1.num / n2.num))
                 }
                 throw ProgramError.divByZero
             }
         }
         throw ProgramError.wrongType
+    }
+    throw ProgramError.wrongArity
+}
+
+func leq(vals : [Value]) -> Value  {
+    if vals.count == 2 {
+        if let n1 = vals[0] as? NumV {
+            if let n2 = vals[1] as? NumV {
+                return BoolV(b: (n1.num <= n2.num ))
+            }
+        }
+        throw ProgramError.wrongType
+        
+func equal?(vals : [Value]) -> Value  {
+    if vals.count == 2 {
+        if let n1 = vals[0] as? NumV {
+            if let n2 = vals[1] as? NumV {
+                return BoolV(b: (n1.num == n2.num))
+            }
+        }
+        if let b1 = vals[0] as? BoolV {
+            if let b2 = vals[1] as? BoolV{
+                return BoolV(b: (b1.b == b2.b))
+            }
+        }
+        if let s1 = vals[0] as? StrV {
+            if let s2 = vals[1] as? StrV {
+                return BoolV(b: (s1.str == s2.str))
+            }
+        }
+        return BoolV(b: false)
     }
     throw ProgramError.wrongArity
 }
@@ -188,6 +219,7 @@ let topEnv = Env(list: [EnvStruct(id: "true", val: BoolV(b: true)),
                          EnvStruct(id: "/", val: PrimV(fn: div)),
                          EnvStruct(id: "<=", val: PrimV(fn: leq)),
                          EnvStruct(id: "equal?", val: PrimV(fn: eq))])
+
 
 func envLookup(env: Env, s: String) -> Value {
     for bind in env.list {
