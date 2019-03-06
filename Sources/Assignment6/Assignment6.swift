@@ -178,6 +178,18 @@ func div(vals : [Value]) -> Value  {
     throw ProgramError.wrongArity
 }
 
+func leq(vals : [Value]) -> Value  {
+    if vals.count == 2 {
+        if let n1 = vals[0] as? NumV {
+            if let n2 = vals[1] as? NumV {
+                return BoolV(b: (n1.num <= n2.num ))
+            }
+        }
+        throw ProgramError.wrongType
+    }
+    throw ProgramError.wrongArity
+}
+
 let topEnv = Env(list: [EnvStruct(id: "true", val: BoolV(b: true)),
                          EnvStruct(id: "false", val: BoolV(b: false)),
                          EnvStruct(id: "+", val: PrimV(fn: plus)),
