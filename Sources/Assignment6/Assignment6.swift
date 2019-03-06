@@ -138,13 +138,34 @@ func envLookup(env: Env, s: String) -> Value {
     }
 }
 
+func interpArgs(args: [ExprC], env: Env) -> [Value] {
+    let arr: [Value]
+    for a in args {
+        arr.append(interp(e: a, env: env))
+    }
+    return arr
+}
+
 func interp(e: ExprC, env: Env) -> Value {
     switch e {
     case is NumC:
-        return NumV(num: e.num)
+        let x = e as! NumC
+        return NumV(num: x.num)
     case is IdC:
-        return envLookup(env: env, s: e.id)
+        let x = e as! IdC
+        return envLookup(env: env, s: x.id)
     case is StrC:
-        return StrV(str: e.str)
+        let x = e as! StrC
+        return StrV(str: x.str)
+    case is AppC:
+        let x = e as! AppC
+        switch interp(e:x.fn, env: env) {
+        case is PrimV:
+            let y = e as! PrimV
+            let a = interpArgs(args: x.args, env: env)
+            return y.fn(a)
+        }
+    default:
+        return StrV(str: "error")
     }
 }
