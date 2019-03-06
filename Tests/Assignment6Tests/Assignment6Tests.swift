@@ -61,19 +61,19 @@ final class Assignment6Tests: XCTestCase {
     }
     
     func testEnvLookupFound() {
-        XCTAssertEqual(env-lookup(env: top-env, s: "false"), BoolV(b: false))
+        XCTAssertEqual(envLookup(env: topEnv, s: "false"), BoolV(b: false))
     }
     
     func testInterpNumC() {
-        XCTAssertEqual(interp(e: NumC(num: 1), env: top-env), NumV(num: 1))
+        XCTAssertEqual(interp(e: NumC(num: 1), env: topEnv), NumV(num: 1))
     }
     
     func testInterpIdC() {
-        XCTAssertEqual(interp(e: IdC(id: "true"), env: top-env), BoolV(b: true))
+        XCTAssertEqual(interp(e: IdC(id: "true"), env: topEnv), BoolV(b: true))
     }
     
     func testInterpStrC() {
-        XCTAssertEqual(interp(e: StrC(str: "test"), env: top-env), StrV(str: "test"))
+        XCTAssertEqual(interp(e: StrC(str: "test"), env: topEnv), StrV(str: "test"))
     }
 
     static var allTests = [

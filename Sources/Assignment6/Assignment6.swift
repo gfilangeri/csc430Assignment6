@@ -147,7 +147,7 @@ let top-env = Env(list: [EnvStruct(id: "true", val: BoolV(b: true)),
                          EnvStruct(id: "<=", val: PrimV(fn: leq)),
                          EnvStruct(id: "equal?", val: PrimV(fn: eq))])
 
-func env-lookup(env: Env, s: String) -> Value {
+func envLookup(env: Env, s: String) -> Value {
     for bind in env.list {
         if bind.id == s {
             return bind.val
@@ -160,7 +160,7 @@ func interp(e: ExprC, env: Env) -> Value {
     case is NumC:
         return NumV(num: e.num)
     case is IdC:
-        return env-lookup(env: env, s: e.id)
+        return envLookup(env: env, s: e.id)
     case is StrC:
         return StrV(str: e.str)
     }
