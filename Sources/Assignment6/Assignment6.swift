@@ -282,6 +282,31 @@ func interp(e: ExprC, env: Env) throws -> Value {
     }
 }
 
+unc setupParse (program : String) -> [[String]]{
+    var arr : [[String]] = [[]]
+    var index = 0
+    while index < program.count {
+        if !validChar(c: program[program.index(program.startIndex, offsetBy: index)]){
+            index = index + 1
+        }
+        else {
+            let start = index
+            while validChar(c: program[program.index(program.startIndex, offsetBy: index)]) {
+                index = index + 1
+            }
+            arr.append([String(program[String.Index(encodedOffset: start)..<String.Index(encodedOffset: index)])])
+        }
+    }
+    return arr
+}
+
+func validChar (c : Character) -> Bool {
+    if c == "{" || c == "}" || c == " " {
+        return false
+    }
+    return true
+}
+
 var num = (try! (interp(e: NumC(num: 1), env: topEnv))) as! NumV
 print(num.num)
 var str = (try! (interp(e: StrC(str: "hello"), env: topEnv))) as! StrV
