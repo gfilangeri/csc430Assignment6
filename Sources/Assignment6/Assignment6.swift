@@ -186,8 +186,10 @@ func leq(vals : [Value]) -> Value  {
             }
         }
         throw ProgramError.wrongType
+    }
+}
         
-func equal?(vals : [Value]) -> Value  {
+func eq(vals : [Value]) -> Value  {
     if vals.count == 2 {
         if let n1 = vals[0] as? NumV {
             if let n2 = vals[1] as? NumV {
