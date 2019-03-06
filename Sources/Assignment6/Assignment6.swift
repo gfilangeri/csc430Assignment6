@@ -309,6 +309,62 @@ func validChar (c : Character) -> Bool {
 
 // Tests
 
+func testPrimPlus() {
+    let vals = [NumV(num: 1), NumV(num: 5)]
+    let res = (try! (plus(vals: vals))) as! NumV
+    if res.num != 6 {
+        print("Failed prim plus:")
+        print("expected ", 6)
+        print("actual ", res.num)
+    }
+}
+
+func testPrimMinus() {
+    let vals = [NumV(num: 1), NumV(num: 5)]
+    let res = (try! (minus(vals: vals))) as! NumV
+    if res.num != -4 {
+        print("Failed prim minus:")
+        print("expected ", 4)
+        print("actual ", res.num)
+    }
+}
+
+func testPrimMult() {
+    let vals = [NumV(num: 2), NumV(num: 5)]
+    let res = (try! (mult(vals: vals))) as! NumV
+    if res.num != 10 {
+        print("Failed prim mult:")
+        print("expected ", 10)
+        print("actual ", res.num)
+    }
+}
+
+func testPrimDiv() {
+    let vals = [NumV(num: 10), NumV(num: 5)]
+    let res = (try! (div(vals: vals))) as! NumV
+    if res.num != 2 {
+        print("Failed prim div:")
+        print("expected ", 2)
+        print("actual ", res.num)
+    }
+}
+
+func testPrimLeq() {
+    let vals = [NumV(num: 1), NumV(num: 5)]
+    let res = (try! (leq(vals: vals))) as! BoolV
+    if !res.b {
+        print("Failed prim leq:")
+    }
+}
+
+func testPrimEq() {
+    let vals = [NumV(num: 1), NumV(num: 5)]
+    let res = (try! (eq(vals: vals))) as! BoolV
+    if res.b {
+        print("Failed prim eq:")
+    }
+}
+
 func testInterpNumC() {
     let num = (try! (interp(e: NumC(num: 1), env: topEnv))) as! NumV
     if num.num != 1 {
@@ -460,5 +516,10 @@ testInitNumV()
 testInitStrV()
 testInitCloV()
 testInitBoolV()
-
+testPrimPlus()
+testPrimMinus()
+testPrimMult()
+testPrimDiv()
+testPrimLeq()
+testPrimEq()
 
