@@ -114,9 +114,9 @@ class BoolV : Value {
 }
 
 class PrimV : Value {
-    let fn : (([Value]) -> Value)
+    let fn : (([Value]) throws -> Value)
     
-    init (fn : @escaping (([Value]) -> Value)) {
+    init (fn : @escaping (([Value]) throws -> Value)) {
         self.fn = fn
     }
 }
@@ -127,6 +127,7 @@ enum ProgramError : Error {
     case divByZero
     case wrongAppC
     case wrongExprC
+    case notInEnv
 }
 
 func plus(vals : [Value]) throws -> Value {
@@ -180,16 +181,18 @@ func div(vals : [Value]) throws -> Value  {
     throw ProgramError.wrongArity
 }
 
-func leq(vals : [Value]) -> Value  {
+func leq(vals : [Value]) throws -> Value  {
     if vals.count == 2 {
         if let n1 = vals[0] as? NumV {
             if let n2 = vals[1] as? NumV {
                 return BoolV(b: (n1.num <= n2.num ))
             }
         }
-        throw ProgramError.wrongType
-        
-func equal?(vals : [Value]) -> Value  {
+    }
+    throw ProgramError.wrongType
+}
+
+func eq(vals : [Value]) throws -> Value  {
     if vals.count == 2 {
         if let n1 = vals[0] as? NumV {
             if let n2 = vals[1] as? NumV {
@@ -212,25 +215,26 @@ func equal?(vals : [Value]) -> Value  {
 }
 
 let topEnv = Env(list: [EnvStruct(id: "true", val: BoolV(b: true)),
-                         EnvStruct(id: "false", val: BoolV(b: false)),
-                         EnvStruct(id: "+", val: PrimV(fn: plus)),
-                         EnvStruct(id: "-", val: PrimV(fn: minus)),
-                         EnvStruct(id: "*", val: PrimV(fn: mult)),
-                         EnvStruct(id: "/", val: PrimV(fn: div)),
-                         EnvStruct(id: "<=", val: PrimV(fn: leq)),
-                         EnvStruct(id: "equal?", val: PrimV(fn: eq))])
+                        EnvStruct(id: "false", val: BoolV(b: false)),
+                        EnvStruct(id: "+", val: PrimV(fn: plus)),
+                        EnvStruct(id: "-", val: PrimV(fn: minus)),
+                        EnvStruct(id: "*", val: PrimV(fn: mult)),
+                        EnvStruct(id: "/", val: PrimV(fn: div)),
+                        EnvStruct(id: "<=", val: PrimV(fn: leq)),
+                        EnvStruct(id: "equal?", val: PrimV(fn: eq))])
 
 
-func envLookup(env: Env, s: String) -> Value {
+func envLookup(env: Env, s: String) throws -> Value {
     for bind in env.list {
         if bind.id == s {
             return bind.val
         }
     }
+    throw ProgramError.notInEnv
 }
 
 func interpArgs(args: [ExprC], env: Env) -> [Value] {
-    let arr: [Value]
+    var arr = [Value]()
     for a in args {
         arr.append(try! interp(e: a, env: env))
     }
@@ -244,7 +248,7 @@ func interp(e: ExprC, env: Env) throws -> Value {
         return NumV(num: x.num)
     case is IdC:
         let x = e as! IdC
-        return envLookup(env: env, s: x.id)
+        return try! envLookup(env: env, s: x.id)
     case is StrC:
         let x = e as! StrC
         return StrV(str: x.str)
@@ -255,7 +259,7 @@ func interp(e: ExprC, env: Env) throws -> Value {
         case is PrimV:
             let z = y as! PrimV
             let a = interpArgs(args: x.args, env: env)
-            return z.fn(a)
+            return try! z.fn(a)
         default:
             throw ProgramError.wrongAppC
         }
