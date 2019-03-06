@@ -131,7 +131,7 @@ func plus(vals : [Value]) -> Value  {
     if vals.count == 2 {
         if let n1 = vals[0] as? NumV {
             if let n2 = vals[1] as? NumV {
-                return NumV(num: (n1.num + n2.num ))
+                return NumV(num: (n1.num + n2.num))
             }
         }
         throw ProgramError.wrongType
@@ -143,7 +143,7 @@ func minus(vals : [Value]) -> Value  {
     if vals.count == 2 {
         if let n1 = vals[0] as? NumV {
             if let n2 = vals[1] as? NumV {
-                return NumV(num: (n1.num - n2.num ))
+                return NumV(num: (n1.num - n2.num))
             }
         }
         throw ProgramError.wrongType
@@ -155,7 +155,7 @@ func mult(vals : [Value]) -> Value  {
     if vals.count == 2 {
         if let n1 = vals[0] as? NumV {
             if let n2 = vals[1] as? NumV {
-                return NumV(num: (n1.num * n2.num ))
+                return NumV(num: (n1.num * n2.num))
             }
         }
         throw ProgramError.wrongType
@@ -168,7 +168,7 @@ func div(vals : [Value]) -> Value  {
         if let n1 = vals[0] as? NumV {
             if let n2 = vals[1] as? NumV {
                 if n2.num != 0 {
-                    return NumV(num: (n1.num / n2.num ))
+                    return NumV(num: (n1.num / n2.num))
                 }
                 throw ProgramError.divByZero
             }
@@ -186,6 +186,25 @@ func leq(vals : [Value]) -> Value  {
             }
         }
         throw ProgramError.wrongType
+        
+func equal?(vals : [Value]) -> Value  {
+    if vals.count == 2 {
+        if let n1 = vals[0] as? NumV {
+            if let n2 = vals[1] as? NumV {
+                return BoolV(b: (n1.num == n2.num))
+            }
+        }
+        if let b1 = vals[0] as? BoolV {
+            if let b2 = vals[1] as? BoolV{
+                return BoolV(b: (b1.b == b2.b))
+            }
+        }
+        if let s1 = vals[0] as? StrV {
+            if let s2 = vals[1] as? StrV {
+                return BoolV(b: (s1.str == s2.str))
+            }
+        }
+        return BoolV(b: false)
     }
     throw ProgramError.wrongArity
 }
