@@ -121,7 +121,65 @@ class PrimV : Value {
     }
 }
 
-let topEnv = Env(list: [EnvStruct(id: "true", val: BoolV(b: true)),
+enum ProgramError : Error {
+    case wrongArity
+    case wrongType
+    case divByZero
+}
+
+func plus(vals : [Value]) -> Value  {
+    if vals.count == 2 {
+        if let n1 = vals[0] as? NumV {
+            if let n2 = vals[1] as? NumV {
+                return NumV(num: (n1.num + n2.num ))
+            }
+        }
+        throw ProgramError.wrongType
+    }
+    throw ProgramError.wrongArity
+}
+
+func mult(vals : [Value]) -> Value  {
+    if vals.count == 2 {
+        if let n1 = vals[0] as? NumV {
+            if let n2 = vals[1] as? NumV {
+                return NumV(num: (n1.num * n2.num ))
+            }
+        }
+        throw ProgramError.wrongType
+    }
+    throw ProgramError.wrongArity
+}
+
+func div(vals : [Value]) -> Value  {
+    if vals.count == 2 {
+        if let n1 = vals[0] as? NumV {
+            if let n2 = vals[1] as? NumV {
+                if (n2.num != 0) {
+                    return NumV(num: (n1.num / n2.num ))
+                }
+                throw ProgramError.divByZero
+            }
+        }
+        throw ProgramError.wrongType
+    }
+    throw ProgramError.wrongArity
+}
+
+func leq(vals : [Value]) -> Value  {
+    if vals.count == 2 {
+        if let n1 = vals[0] as? NumV {
+            if let n2 = vals[1] as? NumV {
+                return BoolV(b: (n1.num <= n2.num ))
+            }
+        }
+        throw ProgramError.wrongType
+    }
+    throw ProgramError.wrongArity
+}
+
+
+let top-env = Env(list: [EnvStruct(id: "true", val: BoolV(b: true)),
                          EnvStruct(id: "false", val: BoolV(b: false)),
                          EnvStruct(id: "+", val: PrimV(fn: plus)),
                          EnvStruct(id: "-", val: PrimV(fn: minus)),
@@ -129,21 +187,6 @@ let topEnv = Env(list: [EnvStruct(id: "true", val: BoolV(b: true)),
                          EnvStruct(id: "/", val: PrimV(fn: div)),
                          EnvStruct(id: "<=", val: PrimV(fn: leq)),
                          EnvStruct(id: "equal?", val: PrimV(fn: eq))])
-
-func mult(vals: [Value]) -> Value {
-    switch vals[0] {
-        case is NumV:
-            switch vals[1] {
-            case is NumV:
-                return vals[0].num * vals[1].num
-            default:
-                return "error"
-            }
-        default:
-            return "error"
-    }
-}
-
 
 
 func envLookup(env: Env, s: String) -> Value {
@@ -164,4 +207,5 @@ func interp(e: ExprC, env: Env) -> Value {
         return StrV(str: e.str)
     }
 }
+
 
