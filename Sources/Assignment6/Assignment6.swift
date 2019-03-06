@@ -267,3 +267,20 @@ func interp(e: ExprC, env: Env) throws -> Value {
         throw ProgramError.wrongExprC
     }
 }
+
+var num = (try! (interp(e: NumC(num: 1), env: topEnv))) as! NumV
+print(num.num)
+var str = (try! (interp(e: StrC(str: "hello"), env: topEnv))) as! StrV
+print(str.str)
+num = (try! (interp(e: AppC(fn: IdC(id: "+"), args: [NumC(num: 1), NumC(num: 2)]), env: topEnv))) as! NumV
+print(num.num)
+num = (try! (interp(e: AppC(fn: IdC(id: "-"), args: [NumC(num: 1), NumC(num: 2)]), env: topEnv))) as! NumV
+print(num.num)
+num = (try! (interp(e: AppC(fn: IdC(id: "*"), args: [NumC(num: 1), NumC(num: 2)]), env: topEnv))) as! NumV
+print(num.num)
+num = (try! (interp(e: AppC(fn: IdC(id: "/"), args: [NumC(num: 1), NumC(num: 2)]), env: topEnv))) as! NumV
+print(num.num)
+var bool = (try! (interp(e: AppC(fn: IdC(id: "<="), args: [NumC(num: 1), NumC(num: 2)]), env: topEnv))) as! BoolV
+print(bool.b)
+bool = (try! (interp(e: AppC(fn: IdC(id: "equal?"), args: [NumC(num: 1), NumC(num: 2)]), env: topEnv))) as! BoolV
+print(bool.b)
