@@ -138,7 +138,7 @@ func plus(vals : [Value]) -> Value  {
     throw ProgramError.wrongArity
 }
 
-let top-env = Env(list: [EnvStruct(id: "true", val: BoolV(b: true)),
+let topEnv = Env(list: [EnvStruct(id: "true", val: BoolV(b: true)),
                          EnvStruct(id: "false", val: BoolV(b: false)),
                          EnvStruct(id: "+", val: PrimV(fn: plus)),
                          EnvStruct(id: "-", val: PrimV(fn: minus)),
@@ -176,13 +176,16 @@ func interp(e: ExprC, env: Env) -> Value {
         return StrV(str: x.str)
     case is AppC:
         let x = e as! AppC
-        switch interp(e:x.fn, env: env) {
+        let y = interp(e:x.fn, env: env)
+        switch y {
         case is PrimV:
-            let y = e as! PrimV
+            let z = y as! PrimV
             let a = interpArgs(args: x.args, env: env)
-            return y.fn(a)
+            return z.fn(a)
+        default:
+            return StrV(str: "error")
         }
     default:
         return StrV(str: "error")
     }
-
+}
