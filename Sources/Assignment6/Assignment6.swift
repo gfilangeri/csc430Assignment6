@@ -268,19 +268,47 @@ func interp(e: ExprC, env: Env) throws -> Value {
     }
 }
 
-var num = (try! (interp(e: NumC(num: 1), env: topEnv))) as! NumV
-print(num.num)
-var str = (try! (interp(e: StrC(str: "hello"), env: topEnv))) as! StrV
-print(str.str)
-num = (try! (interp(e: AppC(fn: IdC(id: "+"), args: [NumC(num: 1), NumC(num: 2)]), env: topEnv))) as! NumV
-print(num.num)
-num = (try! (interp(e: AppC(fn: IdC(id: "-"), args: [NumC(num: 1), NumC(num: 2)]), env: topEnv))) as! NumV
-print(num.num)
-num = (try! (interp(e: AppC(fn: IdC(id: "*"), args: [NumC(num: 1), NumC(num: 2)]), env: topEnv))) as! NumV
-print(num.num)
-num = (try! (interp(e: AppC(fn: IdC(id: "/"), args: [NumC(num: 1), NumC(num: 2)]), env: topEnv))) as! NumV
-print(num.num)
-var bool = (try! (interp(e: AppC(fn: IdC(id: "<="), args: [NumC(num: 1), NumC(num: 2)]), env: topEnv))) as! BoolV
-print(bool.b)
-bool = (try! (interp(e: AppC(fn: IdC(id: "equal?"), args: [NumC(num: 1), NumC(num: 2)]), env: topEnv))) as! BoolV
-print(bool.b)
+// Tests
+
+func testInterpNumC() {
+    let num = (try! (interp(e: NumC(num: 1), env: topEnv))) as! NumV
+    if num.num != 1 {
+        print("Failed NumC interp")
+    }
+}
+
+func testInterpStrC() {
+    let str = (try! (interp(e: StrC(str: "hello"), env: topEnv))) as! StrV
+    if str.str != "hello" {
+        print("Failed StrC interp")
+    }
+}
+
+func testInterpPlus() {
+    let num = (try! (interp(e: AppC(fn: IdC(id: "+"), args: [NumC(num: 1), NumC(num: 2)]), env: topEnv))) as! NumV
+    if num.num != 3 {
+        print("Failed Plus interp")
+    }
+}
+
+func testInterpMinus() {
+    let num = (try! (interp(e: AppC(fn: IdC(id: "-"), args: [NumC(num: 1), NumC(num: 2)]), env: topEnv))) as! NumV
+    if num.num != -1 {
+        print("Failed Minus interp")
+    }
+}
+
+
+//num = (try! (interp(e: AppC(fn: IdC(id: "*"), args: [NumC(num: 1), NumC(num: 2)]), env: topEnv))) as! NumV
+//print(num.num)
+//num = (try! (interp(e: AppC(fn: IdC(id: "/"), args: [NumC(num: 1), NumC(num: 2)]), env: topEnv))) as! NumV
+//print(num.num)
+//var bool = (try! (interp(e: AppC(fn: IdC(id: "<="), args: [NumC(num: 1), NumC(num: 2)]), env: topEnv))) as! BoolV
+//print(bool.b)
+//bool = (try! (interp(e: AppC(fn: IdC(id: "equal?"), args: [NumC(num: 1), NumC(num: 2)]), env: topEnv))) as! BoolV
+//print(bool.b)
+
+testInterpNumC()
+testInterpStrC()
+testInterpPlus()
+testInterpMinus()
