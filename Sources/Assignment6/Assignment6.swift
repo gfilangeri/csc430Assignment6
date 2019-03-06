@@ -252,6 +252,20 @@ func interp(e: ExprC, env: Env) throws -> Value {
     case is StrC:
         let x = e as! StrC
         return StrV(str: x.str)
+    case is IfC:
+        let x = e as! IfC
+        let test = try! interp(e: x.ifStmnt, env: env)
+        switch test {
+            case is BoolV:
+                let test2 = test as! BoolV
+                if (test2.b) {
+                    return try! interp(e: x.thenStmnt, env: env)
+                } else {
+                    return try! interp(e: x.elseStmnt, env: env)
+                }
+            default:
+                throw ProgramError.wrongExprC
+        }
     case is AppC:
         let x = e as! AppC
         let y = try interp(e:x.fn, env: env)
@@ -284,3 +298,5 @@ var bool = (try! (interp(e: AppC(fn: IdC(id: "<="), args: [NumC(num: 1), NumC(nu
 print(bool.b)
 bool = (try! (interp(e: AppC(fn: IdC(id: "equal?"), args: [NumC(num: 1), NumC(num: 2)]), env: topEnv))) as! BoolV
 print(bool.b)
+num = (try! (interp(e: IfC(ifStmnt: IdC(id: "true"), thenStmnt: NumC(num: 1), elseStmnt: NumC(num: 2)), env: topEnv))) as! NumV
+print(num.num)
