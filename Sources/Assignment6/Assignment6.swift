@@ -282,6 +282,31 @@ func interp(e: ExprC, env: Env) throws -> Value {
     }
 }
 
+func setupParse (program : String) -> [[String]]{
+    var arr : [[String]] = [[]]
+    var index = 0
+    while index < program.count {
+        if !validChar(c: program[program.index(program.startIndex, offsetBy: index)]){
+            index = index + 1
+        }
+        else {
+            let start = index
+            while validChar(c: program[program.index(program.startIndex, offsetBy: index)]) {
+                index = index + 1
+            }
+            arr.append([String(program[String.Index(encodedOffset: start)..<String.Index(encodedOffset: index)])])
+        }
+    }
+    return arr
+}
+
+func validChar (c : Character) -> Bool {
+    if c == "{" || c == "}" || c == " " {
+        return false
+    }
+    return true
+}
+
 // Tests
 
 func testInterpNumC() {
@@ -312,60 +337,47 @@ func testInterpMinus() {
     }
 }
 
+func testInterpMult() {
+   let num = (try! (interp(e: AppC(fn: IdC(id: "*"), args: [NumC(num: 1), NumC(num: 2)]), env: topEnv))) as! NumV
+    if num.num != 2 {
+        print("Failed Mult interp")
+    }
+}
 
-//num = (try! (interp(e: AppC(fn: IdC(id: "*"), args: [NumC(num: 1), NumC(num: 2)]), env: topEnv))) as! NumV
-//print(num.num)
-//num = (try! (interp(e: AppC(fn: IdC(id: "/"), args: [NumC(num: 1), NumC(num: 2)]), env: topEnv))) as! NumV
-//print(num.num)
-//var bool = (try! (interp(e: AppC(fn: IdC(id: "<="), args: [NumC(num: 1), NumC(num: 2)]), env: topEnv))) as! BoolV
-//print(bool.b)
-//bool = (try! (interp(e: AppC(fn: IdC(id: "equal?"), args: [NumC(num: 1), NumC(num: 2)]), env: topEnv))) as! BoolV
-//print(bool.b)
+func testInterpDiv() {
+    let num = (try! (interp(e: AppC(fn: IdC(id: "/"), args: [NumC(num: 1), NumC(num: 2)]), env: topEnv))) as! NumV
+    if num.num != 0.5 {
+        print("Failed Div Interp")
+    }
+}
+
+func testInterpLeq() {
+    let bool = (try! (interp(e: AppC(fn: IdC(id: "<="), args: [NumC(num: 1), NumC(num: 2)]), env: topEnv))) as! BoolV
+    if !bool.b {
+        print("Failed <= Interp")
+    }
+}
+
+func testInterpEq() {
+    let bool = (try! (interp(e: AppC(fn: IdC(id: "equal?"), args: [NumC(num: 1), NumC(num: 2)]), env: topEnv))) as! BoolV
+    if bool.b {
+        print("Failed equal? Interp")
+    }
+}
+
+func testInterpIfC() {
+    let num = (try! (interp(e: IfC(ifStmnt: IdC(id: "true"), thenStmnt: NumC(num: 1), elseStmnt: NumC(num: 2)), env: topEnv))) as! NumV
+    if num.num != 1 {
+        print("Failed IfC Interp")
+    }
+}
 
 testInterpNumC()
 testInterpStrC()
 testInterpPlus()
 testInterpMinus()
-func setupParse (program : String) -> [[String]]{
-    var arr : [[String]] = [[]]
-    var index = 0
-    while index < program.count {
-        if !validChar(c: program[program.index(program.startIndex, offsetBy: index)]){
-            index = index + 1
-        }
-        else {
-            let start = index
-            while validChar(c: program[program.index(program.startIndex, offsetBy: index)]) {
-                index = index + 1
-            }
-            arr.append([String(program[String.Index(encodedOffset: start)..<String.Index(encodedOffset: index)])])
-        }
-    }
-    return arr
-}
-
-func validChar (c : Character) -> Bool {
-    if c == "{" || c == "}" || c == " " {
-        return false
-    }
-    return true
-}
-
-var num = (try! (interp(e: NumC(num: 1), env: topEnv))) as! NumV
-print(num.num)
-var str = (try! (interp(e: StrC(str: "hello"), env: topEnv))) as! StrV
-print(str.str)
-num = (try! (interp(e: AppC(fn: IdC(id: "+"), args: [NumC(num: 1), NumC(num: 2)]), env: topEnv))) as! NumV
-print(num.num)
-num = (try! (interp(e: AppC(fn: IdC(id: "-"), args: [NumC(num: 1), NumC(num: 2)]), env: topEnv))) as! NumV
-print(num.num)
-num = (try! (interp(e: AppC(fn: IdC(id: "*"), args: [NumC(num: 1), NumC(num: 2)]), env: topEnv))) as! NumV
-print(num.num)
-num = (try! (interp(e: AppC(fn: IdC(id: "/"), args: [NumC(num: 1), NumC(num: 2)]), env: topEnv))) as! NumV
-print(num.num)
-var bool = (try! (interp(e: AppC(fn: IdC(id: "<="), args: [NumC(num: 1), NumC(num: 2)]), env: topEnv))) as! BoolV
-print(bool.b)
-bool = (try! (interp(e: AppC(fn: IdC(id: "equal?"), args: [NumC(num: 1), NumC(num: 2)]), env: topEnv))) as! BoolV
-print(bool.b)
-num = (try! (interp(e: IfC(ifStmnt: IdC(id: "true"), thenStmnt: NumC(num: 1), elseStmnt: NumC(num: 2)), env: topEnv))) as! NumV
-print(num.num)
+testInterpMult()
+testInterpDiv()
+testInterpLeq()
+testInterpEq()
+testInterpIfC()
