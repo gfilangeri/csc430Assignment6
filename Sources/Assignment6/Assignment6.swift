@@ -371,6 +371,75 @@ func testInterpIfC() {
         print("Failed IfC Interp")
     }
 }
+func testInitNumC() {
+    let n = NumC(num: 1)
+    if n.num != 1 {
+        print("Failed NumC")
+    }   
+}
+
+func testInitStrC() {
+    let s = StrC(str: "hi")
+    if s.str != "hi" {
+        print("Failed StrC")
+    } 
+}
+    
+func testInitIdC() {
+    let id = IdC(id: "hi")
+    if id.id != "hi" {
+        print("Failed IdC")
+    }
+}
+    
+func testInitAppC() {
+    let app = AppC(fn: NumC(num: 1), args: [NumC(num: 1)])
+    if (app.fn as! NumC).num != 1 {
+        print("Failed AppC")
+    }
+}
+    
+func testInitIfC() {
+    let f = IfC(ifStmnt: NumC(num: 1), thenStmnt: NumC(num: 1), elseStmnt: NumC(num: 2))
+    if !(((f.ifStmnt as! NumC).num == 1) && ((f.thenStmnt as! NumC).num == 1)) {
+        print("Failed IfC")
+    }
+}
+    
+func testInitLamC() {
+    let l = LamC(param: [NumC(num: 1)], body: NumC(num: 1))
+    if (l.param[0] as! NumC).num != 1 {
+        print("Failed LamC")
+    }
+}
+
+func testInitNumV() {
+    let n = NumV(num: 1)
+    if n.num != 1 {
+        print("Failed NumV")
+    }
+}
+    
+func testInitStrV() {
+    let s = StrV(str: "hi")
+    if s.str != "hi" {
+        print("Failed StrV")
+    }
+}
+    
+func testInitCloV() {
+    let c = CloV(param: [IdC(id: "hi")], body: NumC(num: 1), cloEnv: Env(list: []))
+    if !((c.param[0].id == "hi") && ((c.body as! NumC).num == 1)) {
+        print("Failed CloV")
+    }
+}
+    
+func testInitBoolV() {
+    let b = BoolV(b: true)
+    if !b.b {
+        print("Failed BoolV")
+    }
+}
 
 testInterpNumC()
 testInterpStrC()
@@ -381,3 +450,15 @@ testInterpDiv()
 testInterpLeq()
 testInterpEq()
 testInterpIfC()
+testInitNumC()
+testInitStrC()
+testInitIdC()
+testInitAppC()
+testInitIfC()
+testInitLamC()
+testInitNumV()
+testInitStrV()
+testInitCloV()
+testInitBoolV()
+
+
