@@ -125,9 +125,11 @@ enum ProgramError : Error {
     case wrongArity
     case wrongType
     case divByZero
+    case wrongAppC
+    case wrongExprC
 }
 
-func plus(vals : [Value]) -> Value  {
+func plus(vals : [Value]) throws -> Value {
     if vals.count == 2 {
         if let n1 = vals[0] as? NumV {
             if let n2 = vals[1] as? NumV {
@@ -139,7 +141,7 @@ func plus(vals : [Value]) -> Value  {
     throw ProgramError.wrongArity
 }
 
-func minus(vals : [Value]) -> Value  {
+func minus(vals : [Value]) throws -> Value  {
     if vals.count == 2 {
         if let n1 = vals[0] as? NumV {
             if let n2 = vals[1] as? NumV {
@@ -151,7 +153,7 @@ func minus(vals : [Value]) -> Value  {
     throw ProgramError.wrongArity
 }
 
-func mult(vals : [Value]) -> Value  {
+func mult(vals : [Value]) throws -> Value  {
     if vals.count == 2 {
         if let n1 = vals[0] as? NumV {
             if let n2 = vals[1] as? NumV {
@@ -163,7 +165,7 @@ func mult(vals : [Value]) -> Value  {
     throw ProgramError.wrongArity
 }
 
-func div(vals : [Value]) -> Value  {
+func div(vals : [Value]) throws -> Value  {
     if vals.count == 2 {
         if let n1 = vals[0] as? NumV {
             if let n2 = vals[1] as? NumV {
@@ -198,12 +200,12 @@ func envLookup(env: Env, s: String) -> Value {
 func interpArgs(args: [ExprC], env: Env) -> [Value] {
     let arr: [Value]
     for a in args {
-        arr.append(interp(e: a, env: env))
+        arr.append(try! interp(e: a, env: env))
     }
     return arr
 }
 
-func interp(e: ExprC, env: Env) -> Value {
+func interp(e: ExprC, env: Env) throws -> Value {
     switch e {
     case is NumC:
         let x = e as! NumC
@@ -216,16 +218,16 @@ func interp(e: ExprC, env: Env) -> Value {
         return StrV(str: x.str)
     case is AppC:
         let x = e as! AppC
-        let y = interp(e:x.fn, env: env)
+        let y = try interp(e:x.fn, env: env)
         switch y {
         case is PrimV:
             let z = y as! PrimV
             let a = interpArgs(args: x.args, env: env)
             return z.fn(a)
         default:
-            return StrV(str: "error")
+            throw ProgramError.wrongAppC
         }
     default:
-        return StrV(str: "error")
+        throw ProgramError.wrongExprC
     }
 }
