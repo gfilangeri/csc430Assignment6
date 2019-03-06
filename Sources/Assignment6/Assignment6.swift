@@ -124,6 +124,7 @@ class PrimV : Value {
 enum ProgramError : Error {
     case wrongArity
     case wrongType
+    case divByZero
 }
 
 func plus(vals : [Value]) -> Value  {
@@ -131,6 +132,45 @@ func plus(vals : [Value]) -> Value  {
         if let n1 = vals[0] as? NumV {
             if let n2 = vals[1] as? NumV {
                 return NumV(num: (n1.num + n2.num ))
+            }
+        }
+        throw ProgramError.wrongType
+    }
+    throw ProgramError.wrongArity
+}
+
+func minus(vals : [Value]) -> Value  {
+    if vals.count == 2 {
+        if let n1 = vals[0] as? NumV {
+            if let n2 = vals[1] as? NumV {
+                return NumV(num: (n1.num - n2.num ))
+            }
+        }
+        throw ProgramError.wrongType
+    }
+    throw ProgramError.wrongArity
+}
+
+func mult(vals : [Value]) -> Value  {
+    if vals.count == 2 {
+        if let n1 = vals[0] as? NumV {
+            if let n2 = vals[1] as? NumV {
+                return NumV(num: (n1.num * n2.num ))
+            }
+        }
+        throw ProgramError.wrongType
+    }
+    throw ProgramError.wrongArity
+}
+
+func div(vals : [Value]) -> Value  {
+    if vals.count == 2 {
+        if let n1 = vals[0] as? NumV {
+            if let n2 = vals[1] as? NumV {
+                if n2.num != 0 {
+                    return NumV(num: (n1.num / n2.num ))
+                }
+                throw ProgramError.divByZero
             }
         }
         throw ProgramError.wrongType
