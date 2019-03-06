@@ -121,7 +121,24 @@ class PrimV : Value {
     }
 }
 
-let topEnv = Env(list: [EnvStruct(id: "true", val: BoolV(b: true)),
+enum ProgramError : Error {
+    case wrongArity
+    case wrongType
+}
+
+func plus(vals : [Value]) -> Value  {
+    if vals.count == 2 {
+        if let n1 = vals[0] as? NumV {
+            if let n2 = vals[1] as? NumV {
+                return NumV(num: (n1.num + n2.num ))
+            }
+        }
+        throw ProgramError.wrongType
+    }
+    throw ProgramError.wrongArity
+}
+
+let top-env = Env(list: [EnvStruct(id: "true", val: BoolV(b: true)),
                          EnvStruct(id: "false", val: BoolV(b: false)),
                          EnvStruct(id: "+", val: PrimV(fn: plus)),
                          EnvStruct(id: "-", val: PrimV(fn: minus)),
@@ -168,4 +185,4 @@ func interp(e: ExprC, env: Env) -> Value {
     default:
         return StrV(str: "error")
     }
-}
+
