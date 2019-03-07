@@ -19,33 +19,39 @@ class Env {
     }
 }
 
-class NumC : ExprC {
+class NumC : ExprC, CustomStringConvertible {
     let num : Float
     
     init (num : Float) {
         self.num = num
     }
     
+    public var description : String { return "NumC: \(num)"}
+    
 }
 
-class StrC : ExprC {
+class StrC : ExprC, CustomStringConvertible {
     let str : String
     
     init (str : String) {
         self.str = str
     }
+    
+    public var description : String { return "StrC: \(str)" }
 }
 
 
-class IdC : ExprC {
+class IdC : ExprC, CustomStringConvertible {
     let id : String
     
     init (id : String) {
         self.id = id
     }
+    
+    public var description : String { return "IdC: \(id)" }
 }
 
-class AppC : ExprC {
+class AppC : ExprC, CustomStringConvertible {
     let fn : ExprC
     let args : [ExprC]
     
@@ -53,9 +59,11 @@ class AppC : ExprC {
         self.fn = fn
         self.args = args
     }
+    
+    public var description : String { return "AppC: \(fn) \(args)" }
 }
 
-class IfC : ExprC {
+class IfC : ExprC, CustomStringConvertible {
     let ifStmnt : ExprC
     let thenStmnt : ExprC
     let elseStmnt : ExprC
@@ -65,9 +73,11 @@ class IfC : ExprC {
         self.thenStmnt = thenStmnt
         self.elseStmnt = elseStmnt
     }
+    
+    public var description : String { return "IfC: \(ifStmnt) \(thenStmnt) \(elseStmnt)" }
 }
 
-class LamC : ExprC {
+class LamC : ExprC, CustomStringConvertible {
     let param : [ExprC]
     let body : ExprC
     
@@ -75,6 +85,8 @@ class LamC : ExprC {
         self.param = param
         self.body = body
     }
+    
+    public var description : String { return "LamC: \(param) \(body)"}
 }
 
 class NumV : Value {
@@ -119,6 +131,24 @@ class PrimV : Value {
     init (fn : @escaping (([Value]) throws -> Value)) {
         self.fn = fn
     }
+}
+
+class Expr {}
+
+class SingleExpr : Expr, CustomStringConvertible {
+    let e : String
+    init (e : String) {
+        self.e = e
+    }
+    public var description : String { return e}
+}
+
+class MultiExpr : Expr, CustomStringConvertible {
+    var e : [Expr]
+    init(e : [Expr]){
+        self.e = e
+    }
+    public var description : String { return "\(e)" }
 }
 
 enum ProgramError : Error {
@@ -282,23 +312,101 @@ func interp(e: ExprC, env: Env) throws -> Value {
     }
 }
 
-func setupParse (program : String) -> [[String]]{
-    var arr : [[String]] = [[]]
+func setupParse (program : String) -> Expr {
     var index = 0
-    while index < program.count {
-        if !validChar(c: program[program.index(program.startIndex, offsetBy: index)]){
+    var start = 0
+    var count = 0
+    var e : Expr
+    if (program[String.Index(encodedOffset: index)] == "{" &&  program[String.Index(encodedOffset: program.count-1)] == "}") {
+        while (program[String.Index(encodedOffset: index)] != "}" || count != 1) {
+            if (program[String.Index(encodedOffset: index)] == "{") {
+                count = count + 1
+            }
+            if (program[String.Index(encodedOffset: index)] == "}") {
+                count = count - 1
+            }
             index = index + 1
         }
-        else {
-            let start = index
-            while validChar(c: program[program.index(program.startIndex, offsetBy: index)]) {
+        e = setupParse(program: String(program[String.Index(encodedOffset: 1)..<String.Index(encodedOffset: index)]))
+        if let e2 = e as? SingleExpr {
+            e = MultiExpr(e: [])
+            (e as! MultiExpr).e.append(e2)
+        }
+    } else {
+        e = MultiExpr(e: [])
+        while (index < program.count) {
+            while (index < program.count && (program[String.Index(encodedOffset: index)] != " ")) {
+                if (program[String.Index(encodedOffset: index)] == "{") {
+                    while (index < program.count && program[String.Index(encodedOffset: index)] != "}" || count != 1) {
+                            if (program[String.Index(encodedOffset: index)] == "{") {
+                                count = count + 1
+                             }
+                            if (program[String.Index(encodedOffset: index)] == "}") {
+                                count = count - 1
+                            }
+                            index = index + 1
+                    }
+                }
                 index = index + 1
+            } 
+            if (start == 0 && index == program.count) {
+                return SingleExpr(e: program)
             }
-            arr.append([String(program[String.Index(encodedOffset: start)..<String.Index(encodedOffset: index)])])
+            (e as! MultiExpr).e.append(setupParse(program: String(program[String.Index(encodedOffset: start)..<String.Index(encodedOffset: index)])))
+            index = index + 1
+            start = index
         }
     }
-    return arr
+    return e
 }
+
+func parse (e : Expr) -> ExprC {
+    if let se = e as? SingleExpr {
+        let n = Float(se.e)
+        if n != nil {
+            return NumC(num: n!)
+        }
+        if se.e[String.Index(encodedOffset: 0)] == "\"" {
+            return StrC(str: se.e);
+        }
+        return IdC(id: se.e)
+    }
+    if let me = e as? MultiExpr {
+        if let e1 = me.e[0] as? SingleExpr {
+            if e1.e == "if" && me.e.count == 4 {
+                return IfC(ifStmnt: parse(e: me.e[1]), thenStmnt: parse(e: me.e[2]), elseStmnt: parse(e: me.e[3]))
+            }
+            let e2 = me.e[1] as? MultiExpr
+            if (e1.e == "lam" && e2 != nil && e1.e.count == 3) {
+                print("hi")
+                var e3 : [ExprC]
+                e3 = []
+                for e4 in e2!.e {
+                    e3.append(parse(e: e4))
+                }
+                return LamC(param: e3, body: parse(e: me.e[2]))
+            }
+        }
+        var e6 : [ExprC]
+            e6 = []
+            for i in 1..<me.e.count {
+                e6.append(parse(e: me.e[i]))
+            }
+            return AppC(fn: parse(e: me.e[0]), args: e6)
+    }
+    return ExprC()
+}
+
+//print(setupParse(program: "ab ab"))
+print(setupParse(program: "{4 {1 2}}"))
+print(setupParse(program: "{4 {2} 3}"))
+print(parse(e: setupParse(program: "1")))
+print(parse(e: setupParse(program: "\"Hi\"")))
+print(parse(e: setupParse(program: "+")))
+print(parse(e: setupParse(program: "{if 1 2 3}")))
+print(parse(e: setupParse(program: "{lam {a b} 3}")))
+print(parse(e: setupParse(program: "{a 1 2 3}")))
+print(parse(e: setupParse(program: "{{lam {a b} 3} 1 2}")))
 
 func validChar (c : Character) -> Bool {
     if c == "{" || c == "}" || c == " " {
@@ -308,7 +416,6 @@ func validChar (c : Character) -> Bool {
 }
 
 // Tests
-
 func testPrimPlus() {
     let vals = [NumV(num: 1), NumV(num: 5)]
     let res = (try! (plus(vals: vals))) as! NumV
@@ -522,4 +629,3 @@ testPrimMult()
 testPrimDiv()
 testPrimLeq()
 testPrimEq()
-
